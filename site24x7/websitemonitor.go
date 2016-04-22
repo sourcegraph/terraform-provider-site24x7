@@ -54,7 +54,8 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 
 			"matching_keyword_value": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
+				Default:  " ", // do not auto detect
 			},
 			"matching_keyword_severity": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -64,7 +65,8 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 
 			"unmatching_keyword_value": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
+				Default:  " ", // do not auto detect
 			},
 			"unmatching_keyword_severity": &schema.Schema{
 				Type:     schema.TypeInt,
