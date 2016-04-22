@@ -33,7 +33,7 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 			"check_frequency": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  5,
+				Default:  1,
 			},
 
 			"http_method": &schema.Schema{
@@ -102,7 +102,7 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 			"timeout": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  30,
+				Default:  10,
 			},
 
 			"location_profile_id": &schema.Schema{
