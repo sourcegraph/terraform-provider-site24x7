@@ -13,7 +13,7 @@ func Provider() terraform.ResourceProvider {
 			"authtoken": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("ZOHO_AUTHTOKEN", nil),
+				DefaultFunc: schema.EnvDefaultFunc("SITE24X7_AUTHTOKEN", nil),
 				Description: "Username for StatusCake Account.",
 			},
 		},
