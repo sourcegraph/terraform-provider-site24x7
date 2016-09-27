@@ -29,7 +29,7 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("ZOHO_AUTHTOKEN"); v == "" {
-		t.Fatal("ZOHO_AUTHTOKEN must be set for acceptance tests")
+	if v := os.Getenv("SITE24X7_AUTHTOKEN"); v == "" {
+		t.Fatal("SITE24X7_AUTHTOKEN must be set for acceptance tests")
 	}
 }

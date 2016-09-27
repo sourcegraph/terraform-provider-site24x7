@@ -3,6 +3,7 @@ package site24x7
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -299,7 +300,7 @@ func websiteMonitorCreateOrUpdate(method, url string, expectedResponseStatus int
 		d.Set("notification_profile_id", id)
 	}
 	if m.ThresholdProfileID == "" {
-		id, err := defaultThresholdProfile(client)
+		id, err := defaultThresholdProfile(client, "URL")
 		if err != nil {
 			return err
 		}
@@ -471,16 +472,22 @@ func defaultNotificationProfile(client *http.Client) (string, error) {
 	return apiResp.Data[0].ProfileID, nil
 }
 
-func defaultThresholdProfile(client *http.Client) (string, error) {
+func defaultThresholdProfile(client *http.Client, monitorType string) (string, error) {
 	var apiResp struct {
 		Data []struct {
-			ProfileID string `json:"profile_id"`
+			ProfileID   string `json:"profile_id"`
+			MonitorType string `json:"type"`
 		} `json:"data"`
 	}
 	if err := doGetRequest(client, "https://www.site24x7.com/api/threshold_profiles", &apiResp); err != nil {
 		return "", err
 	}
-	return apiResp.Data[0].ProfileID, nil
+	for _, p := range apiResp.Data {
+		if p.MonitorType == monitorType {
+			return p.ProfileID, nil
+		}
+	}
+	return "", errors.New("no threshold profile found")
 }
 
 func defaultUserGroup(client *http.Client) (string, error) {
