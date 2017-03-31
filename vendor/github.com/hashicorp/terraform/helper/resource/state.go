@@ -111,6 +111,7 @@ func (conf *StateChangeConf) WaitForState() (interface{}, error) {
 				if notfoundTick > conf.NotFoundChecks {
 					result.Error = &NotFoundError{
 						LastError: err,
+						Retries:   notfoundTick,
 					}
 					lastResult.Store(result)
 					return
@@ -140,7 +141,7 @@ func (conf *StateChangeConf) WaitForState() (interface{}, error) {
 					}
 				}
 
-				if !found {
+				if !found && len(conf.Pending) > 0 {
 					result.Error = &UnexpectedStateError{
 						LastError:     err,
 						State:         result.State,
