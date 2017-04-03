@@ -56,7 +56,6 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 			"matching_keyword_value": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  " ", // do not auto detect
 			},
 			"matching_keyword_severity": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -67,7 +66,6 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 			"unmatching_keyword_value": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  " ", // do not auto detect
 			},
 			"unmatching_keyword_severity": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -258,15 +256,15 @@ func websiteMonitorCreateOrUpdate(method, url string, expectedResponseStatus int
 		AuthUser:       d.Get("auth_user").(string),
 		AuthPass:       d.Get("auth_pass").(string),
 		MatchingKeyword: ValueAndSeverity{
-			Value:    d.Get("matching_keyword_value").(string),
+			Value:    fixEmpty(d.Get("matching_keyword_value").(string)),
 			Severity: Status(d.Get("matching_keyword_severity").(int)),
 		},
 		UnmatchingKeyword: ValueAndSeverity{
-			Value:    d.Get("unmatching_keyword_value").(string),
+			Value:    fixEmpty(d.Get("unmatching_keyword_value").(string)),
 			Severity: Status(d.Get("unmatching_keyword_severity").(int)),
 		},
 		MatchRegex: ValueAndSeverity{
-			Value:    d.Get("match_regex_value").(string),
+			Value:    fixEmpty(d.Get("match_regex_value").(string)),
 			Severity: Status(d.Get("match_regex_severity").(int)),
 		},
 		MatchCase:             d.Get("match_case").(bool),
@@ -349,6 +347,13 @@ func websiteMonitorCreateOrUpdate(method, url string, expectedResponseStatus int
 	// can't update the rest of the data here, because the response format is broken
 
 	return nil
+}
+
+func fixEmpty(s string) string {
+	if s == "" {
+		return " "
+	}
+	return s
 }
 
 func websiteMonitorRead(d *schema.ResourceData, meta interface{}) error {
