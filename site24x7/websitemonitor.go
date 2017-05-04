@@ -106,17 +106,17 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 
 			"location_profile_id": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
 
 			"notification_profile_id": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
 
 			"threshold_profile_id": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
 
 			"monitor_group_id": &schema.Schema{
@@ -129,7 +129,7 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Computed: true,
+				Optional: true,
 			},
 
 			"action_ids": &schema.Schema{
