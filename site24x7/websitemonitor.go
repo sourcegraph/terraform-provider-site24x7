@@ -154,8 +154,11 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 				Default:  true,
 			},
 
-			"notify_to_pager_duty": &schema.Schema{
-				Type:     schema.TypeBool,
+			"third_party_services": &schema.Schema{
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Optional: true,
 			},
 		},
@@ -212,7 +215,7 @@ type WebsiteMonitor struct {
 	UserGroupIDs          []string         `json:"user_group_ids"`
 	ActionIDs             []ActionRef      `json:"action_ids,omitempty"`
 	UseNameServer         bool             `json:"use_name_server"`
-	NotifyToPagerDuty     bool             `json:"notify_to_pager_duty"`
+	ThirdPartyServices    []string         `json:"third_party_services"`
 }
 
 func websiteMonitorCreate(d *schema.ResourceData, meta interface{}) error {
@@ -247,6 +250,11 @@ func websiteMonitorCreateOrUpdate(method, url string, expectedResponseStatus int
 		actionRefs[i] = ActionRef{ActionID: actionIDs[i].(string), AlertType: alertType}
 	}
 
+	var thirdPartyServiceIDs []string
+	for _, id := range d.Get("third_party_services").([]interface{}) {
+		thirdPartyServiceIDs = append(thirdPartyServiceIDs, id.(string))
+	}
+
 	m := &WebsiteMonitor{
 		DisplayName:    d.Get("display_name").(string),
 		Type:           "URL",
@@ -278,7 +286,7 @@ func websiteMonitorCreateOrUpdate(method, url string, expectedResponseStatus int
 		UserGroupIDs:          userGroupIDs,
 		ActionIDs:             actionRefs,
 		UseNameServer:         d.Get("use_name_server").(bool),
-		NotifyToPagerDuty:     d.Get("notify_to_pager_duty").(bool),
+		ThirdPartyServices:    thirdPartyServiceIDs,
 	}
 
 	if m.LocationProfileID == "" {
@@ -408,7 +416,7 @@ func updateWebsiteMonitorResourceData(d *schema.ResourceData, m *WebsiteMonitor)
 	d.Set("action_ids", actionIDs)
 	d.Set("action_alert_types", actionAlertTypes)
 	d.Set("use_name_server", m.UseNameServer)
-	d.Set("notify_to_pager_duty", m.NotifyToPagerDuty)
+	d.Set("third_party_services", m.ThirdPartyServices)
 }
 
 func websiteMonitorDelete(d *schema.ResourceData, meta interface{}) error {
