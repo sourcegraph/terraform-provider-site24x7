@@ -215,7 +215,7 @@ type WebsiteMonitor struct {
 	UserGroupIDs          []string         `json:"user_group_ids"`
 	ActionIDs             []ActionRef      `json:"action_ids,omitempty"`
 	UseNameServer         bool             `json:"use_name_server"`
-	ThirdPartyServices    []string         `json:"third_party_services"`
+	ThirdPartyServices    []string         `json:"third_party_services,omitempty"`
 }
 
 func websiteMonitorCreate(d *schema.ResourceData, meta interface{}) error {
