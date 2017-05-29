@@ -119,8 +119,11 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 				Computed: true,
 			},
 
-			"monitor_group_id": &schema.Schema{
-				Type:     schema.TypeString,
+			"monitor_groups": &schema.Schema{
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Optional: true,
 			},
 
@@ -203,7 +206,7 @@ type WebsiteMonitor struct {
 	LocationProfileID     string           `json:"location_profile_id"`
 	NotificationProfileID string           `json:"notification_profile_id"`
 	ThresholdProfileID    string           `json:"threshold_profile_id"`
-	MonitorGroupID        string           `json:"monitor_group_id,omitempty"`
+	MonitorGroups         []string         `json:"monitor_groups,omitempty"`
 	UserGroupIDs          []string         `json:"user_group_ids"`
 	ActionIDs             []ActionRef      `json:"action_ids,omitempty"`
 	UseNameServer         bool             `json:"use_name_server"`
@@ -223,6 +226,11 @@ func websiteMonitorCreateOrUpdate(method, url string, expectedResponseStatus int
 	customHeaders := []Header{}
 	for k, v := range d.Get("custom_headers").(map[string]interface{}) {
 		customHeaders = append(customHeaders, Header{Name: k, Value: v.(string)})
+	}
+
+	var monitorGroups []string
+	for _, id := range d.Get("monitor_groups").([]interface{}) {
+		monitorGroups = append(monitorGroups, id.(string))
 	}
 
 	var userGroupIDs []string
@@ -268,7 +276,7 @@ func websiteMonitorCreateOrUpdate(method, url string, expectedResponseStatus int
 		LocationProfileID:     d.Get("location_profile_id").(string),
 		NotificationProfileID: d.Get("notification_profile_id").(string),
 		ThresholdProfileID:    d.Get("threshold_profile_id").(string),
-		MonitorGroupID:        d.Get("monitor_group_id").(string),
+		MonitorGroups:         monitorGroups,
 		UserGroupIDs:          userGroupIDs,
 		ActionIDs:             actionRefs,
 		UseNameServer:         d.Get("use_name_server").(bool),
@@ -390,7 +398,7 @@ func updateWebsiteMonitorResourceData(d *schema.ResourceData, m *WebsiteMonitor)
 	d.Set("location_profile_id", m.LocationProfileID)
 	d.Set("notification_profile_id", m.NotificationProfileID)
 	d.Set("threshold_profile_id", m.ThresholdProfileID)
-	d.Set("monitor_group_id", m.MonitorGroupID)
+	d.Set("monitor_groups", m.MonitorGroups)
 	d.Set("user_group_ids", m.UserGroupIDs)
 	actionIDs := make([]string, len(m.ActionIDs))
 	actionAlertTypes := make([]Status, len(m.ActionIDs))
