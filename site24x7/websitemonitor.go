@@ -106,6 +106,7 @@ func resourceSite24x7WebsiteMonitor() *schema.Resource {
 
 			"location_profile_id": &schema.Schema{
 				Type:     schema.TypeString,
+				Optional: true,
 				Computed: true,
 			},
 
