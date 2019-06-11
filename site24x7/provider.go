@@ -14,8 +14,11 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SITE24X7_AUTHTOKEN", nil),
-				Description: "Username for StatusCake Account.",
+				Description: "Authorization Token for Site24x7.",
 			},
+		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"site24x7_ip_whitelist": dataSourceSite24x7IpWhitelist(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
