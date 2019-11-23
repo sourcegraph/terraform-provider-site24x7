@@ -5,15 +5,19 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/sourcegraph/terraform-provider-site24x7/site24x7/oauth"
 )
 
-func Provider() terraform.ResourceProvider {
+func Provider(ator *oauth.Authenticator) terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"authtoken": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SITE24X7_AUTHTOKEN", nil),
+				DefaultFunc: func() (i interface{}, err error) {
+					accessToken := ator.AccessToken()
+					return accessToken, nil
+				},
 				Description: "Username for StatusCake Account.",
 			},
 		},
@@ -28,7 +32,7 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	h := make(http.Header)
-	h.Set("Authorization", "Zoho-authtoken "+d.Get("authtoken").(string))
+	h.Set("Authorization", "Zoho-oauthtoken "+d.Get("oauthtoken").(string))
 	return &http.Client{
 		Transport: &staticHeaderTransport{
 			base:   http.DefaultTransport,
