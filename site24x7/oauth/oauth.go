@@ -145,7 +145,7 @@ func (ator *Authenticator) AccessToken() string {
 }
 
 // NewAuthenticator creates an authenticator that will acquire an access token by reading it from the specified
-// file if it exists or by requuesting it from Zoho and saving it to the specified file. It also schedules a
+// file if it exists or by requesting it from Zoho and saving it to the specified file. It also schedules a
 // refresh goroutine which will refresh the token ten seconds before it expires.
 func NewAuthenticator(path string) (*Authenticator, error) {
 	ator := &Authenticator{
