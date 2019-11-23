@@ -11,7 +11,7 @@ import (
 	"github.com/sourcegraph/terraform-provider-site24x7/site24x7/oauth"
 )
 
-var oauthFile = flag.String("oauth_file", "", "(required) path to the oauth_file, will be created if it doesn't exist")
+var oauthFile = flag.String("oauth-file", "", "(required) path to the oauth_file, will be created if it doesn't exist")
 
 func main() {
 	flag.Parse()

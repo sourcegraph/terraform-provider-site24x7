@@ -25,21 +25,21 @@ func setRequestHeaders(request *http.Request, accessToken string) {
 	request.Header.Set("Authorization", "Zoho-oauthtoken " + accessToken)
 }
 
-func getUrl(urlValues url.Values) string {
+func getURL(urlValues url.Values) string {
 	baseAccURL := fmt.Sprintf("%s%s", tokenDomain, tokenApi)
-	urlToReturn := fmt.Sprintf("%s?%s", baseAccurl, urlValues.Encode())
+	urlToReturn := fmt.Sprintf("%s?%s", baseAccURL, urlValues.Encode())
 	return urlToReturn
 }
 
 type Authenticator struct {
 	// Protects tkns.AccessToken (updated in refresh goroutine)
-	sync.Mutex
+	sync.RWMutex
 	tkns      tokens
 	storePath string
 }
 
 func (ator *Authenticator) getClient() *http.Client {
-	trTls11 := &http.Transport{
+	trTLS11 := &http.Transport{
 		DisableKeepAlives: true,
 		TLSClientConfig: &tls.Config{
 			MaxVersion:         tls.VersionTLS13,
@@ -47,7 +47,7 @@ func (ator *Authenticator) getClient() *http.Client {
 		},
 	}
 	client := http.Client{
-		Transport: trTls11,
+		Transport: trTLS11,
 		Timeout:   timeout,
 	}
 	return &client
@@ -77,10 +77,10 @@ func (ator *Authenticator) getAccessTokenFrom(urlToPost string) error {
 		return err
 	}
 	ator.Lock()
-	ator.tkns.AccessToken = result["access_token"].(string)
+	ator.tkns.AccessToken, _ = result["access_token"].(string)
 	ator.Unlock()
 
-	ator.tkns.ExpiresInSec = result["expires_in_sec"].(float64)
+	ator.tkns.ExpiresInSec, _ = result["expires_in_sec"].(float64)
 	if ator.tkns.AccessToken == "" || ator.tkns.ExpiresInSec == 0 {
 		return errors.New("error while fetching access token from refresh token: empty token or no expiration")
 	}
@@ -89,11 +89,11 @@ func (ator *Authenticator) getAccessTokenFrom(urlToPost string) error {
 }
 
 func (ator *Authenticator) getAccessTokenFromRefreshToken() error {
-	return ator.getAccessTokenFrom(getUrl(ator.tkns.refreshTokenURLValues()))
+	return ator.getAccessTokenFrom(getURL(ator.tkns.refreshTokenURLValues()))
 }
 
 func (ator *Authenticator) setAccessTokenFromCode() error {
-	return ator.getAccessTokenFrom(getUrl(ator.tkns.generatedCodeURLValues()))
+	return ator.getAccessTokenFrom(getURL(ator.tkns.generatedCodeURLValues()))
 }
 
 func fileExists(path string) (bool, error) {
@@ -138,8 +138,8 @@ func (ator *Authenticator) scheduleRefresh() {
 
 // AccessToken returns the access token.
 func (ator *Authenticator) AccessToken() string {
-	ator.Lock()
-	defer ator.Unlock()
+	ator.RLock()
+	defer ator.RUnlock()
 
 	return ator.tkns.AccessToken
 }
