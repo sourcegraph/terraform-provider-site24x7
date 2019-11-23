@@ -26,7 +26,7 @@ func setRequestHeaders(request *http.Request, accessToken string) {
 }
 
 func getUrl(urlValues url.Values) string {
-	baseAccurl := fmt.Sprintf("%s%s", tokenDomain, tokenApi)
+	baseAccURL := fmt.Sprintf("%s%s", tokenDomain, tokenApi)
 	urlToReturn := fmt.Sprintf("%s?%s", baseAccurl, urlValues.Encode())
 	return urlToReturn
 }
