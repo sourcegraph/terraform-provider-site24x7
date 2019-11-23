@@ -114,8 +114,11 @@ func (ator *Authenticator) refresh() error {
 	if ator.tkns.AccessToken == "" {
 		return errors.New("no access token to refresh")
 	}
-	if ator.tkns.expired() {
-		return ator.getAccessTokenFromRefreshToken()
+	err := ator.getAccessTokenFromRefreshToken()
+	if err != nil {
+		// if we failed to refresh we want to try again in 5 min
+		ator.tkns.ExpiresInSec = 300
+		return err
 	}
 	return nil
 }
