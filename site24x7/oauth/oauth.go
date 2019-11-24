@@ -32,7 +32,7 @@ func getURL(urlValues url.Values) string {
 }
 
 type Authenticator struct {
-	// Protects tkns.AccessToken (updated in refresh goroutine)
+	// Protects tkns.AccessToken (updated in Refresh goroutine)
 	sync.RWMutex
 	tkns      *tokens
 	storePath string
@@ -72,14 +72,24 @@ func (ator *Authenticator) getAccessTokenFrom(urlToPost string) error {
 	if err != nil {
 		return err
 	}
+
+	respErr, _ := result["error"].(string)
+	if respErr != "" {
+		return errors.New(respErr)
+	}
+
 	ator.Lock()
 	ator.tkns.AccessToken, _ = result["access_token"].(string)
 	ator.Unlock()
 
-	ator.tkns.RefreshToken, _ = result["refresh_token"].(string)
 	ator.tkns.ExpiresInSec, _ = result["expires_in_sec"].(float64)
 
-	if ator.tkns.AccessToken == "" || ator.tkns.ExpiresInSec == 0 || ator.tkns.RefreshToken == "" {
+	refreshToken, _ := result["refresh_token"].(string)
+	if refreshToken != "" {
+		ator.tkns.RefreshToken = refreshToken
+	}
+
+	if ator.tkns.AccessToken == "" || ator.tkns.ExpiresInSec == 0 {
 		return errors.New("error while fetching access token: empty token or no expiration")
 	}
 	ator.tkns.TokenGenerationTime = time.Now().UnixNano() / 1e6
@@ -108,13 +118,13 @@ func fileExists(path string) (bool, error) {
 	return false, err
 }
 
-func (ator *Authenticator) refresh() error {
+func (ator *Authenticator) Refresh() error {
 	if ator.tkns.AccessToken == "" {
-		return errors.New("no access token to refresh")
+		return errors.New("no access token to Refresh")
 	}
 	err := ator.getAccessTokenFromRefreshToken()
 	if err != nil {
-		// if we failed to refresh we want to try again in 5 min
+		// if we failed to Refresh we want to try again in 5 min
 		ator.tkns.ExpiresInSec = 300
 		return err
 	}
@@ -126,9 +136,9 @@ func (ator *Authenticator) scheduleRefresh() {
 		for {
 			timer := time.NewTimer(time.Second * time.Duration(math.Max(ator.tkns.ExpiresInSec-10, 2)))
 			<-timer.C
-			err := ator.refresh()
+			err := ator.Refresh()
 			if err != nil {
-				fmt.Printf("failed to refresh access token: %b", err)
+				fmt.Printf("failed to Refresh access token: %b", err)
 			}
 		}
 	}()
@@ -144,7 +154,7 @@ func (ator *Authenticator) AccessToken() string {
 
 // NewAuthenticator creates an authenticator that will acquire an access token by reading it from the specified
 // file if it exists or by requesting it from Zoho and saving it to the specified file. It also schedules a
-// refresh goroutine which will refresh the token ten seconds before it expires.
+// Refresh goroutine which will Refresh the token ten seconds before it expires.
 func NewAuthenticator(path string) (*Authenticator, error) {
 	ator := &Authenticator{
 		storePath: path,
@@ -156,7 +166,8 @@ func NewAuthenticator(path string) (*Authenticator, error) {
 
 	if !storeExists {
 		// persist a template so humans can add client id, client secret and generated code
-		err = ator.tkns.persist(ator.storePath)
+		var tkns tokens
+		err = tkns.persist(ator.storePath)
 		if err != nil {
 			return nil, err
 		}
