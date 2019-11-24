@@ -124,8 +124,8 @@ func (ator *Authenticator) Refresh() error {
 	}
 	err := ator.getAccessTokenFromRefreshToken()
 	if err != nil {
-		// if we failed to Refresh we want to try again in 5 min
-		ator.tkns.ExpiresInSec = 300
+		// if we failed to Refresh we want to try again in 30 secs
+		ator.tkns.ExpiresInSec = 30
 		return err
 	}
 	return nil
@@ -134,7 +134,7 @@ func (ator *Authenticator) Refresh() error {
 func (ator *Authenticator) scheduleRefresh() {
 	go func() {
 		for {
-			timer := time.NewTimer(time.Second * time.Duration(math.Max(ator.tkns.ExpiresInSec-10, 2)))
+			timer := time.NewTimer(time.Second * time.Duration(math.Max(ator.tkns.ExpiresInSec-300, 5)))
 			<-timer.C
 			err := ator.Refresh()
 			if err != nil {

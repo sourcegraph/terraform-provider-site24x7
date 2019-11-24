@@ -1,54 +1,37 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
+	"path/filepath"
 
-	//"github.com/hashicorp/terraform/plugin"
-	//"github.com/hashicorp/terraform/terraform"
-	//"github.com/sourcegraph/terraform-provider-site24x7/site24x7"
+	"github.com/hashicorp/terraform/plugin"
+	"github.com/hashicorp/terraform/terraform"
+	"github.com/sourcegraph/terraform-provider-site24x7/site24x7"
 	"github.com/sourcegraph/terraform-provider-site24x7/site24x7/oauth"
 )
 
-var oauthFile = flag.String("oauth-file", "", "(required) path to the oauth-file, will be created if it doesn't exist")
-var initOauth = flag.Bool("init-oauth", false, "if set initializes oauth-file and exits")
-
+// main is a plugin main, not a "real" main.
+// Please set the value of environment variable SITE24X7_AUTHTOKEN_FILE to a path to a JSDN file (file does not need to exist, it gets created if it doesn't).
+// This JSDN file stores the OAuth2 tokens from site24x7. If you don't set this environment variable it will use path `.size24x7_auth.json`.
 func main() {
-	flag.Parse()
-
-	if *oauthFile == "" {
-		flag.PrintDefaults()
-		os.Exit(2)
+	oauthFile, ok := os.LookupEnv("SITE24X7_AUTHTOKEN_FILE")
+	if !ok {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			log.Fatal(err)
+		}
+		oauthFile = filepath.Join(homeDir, ".size24x7_auth.json")
 	}
 
-	ator, err := oauth.NewAuthenticator(*oauthFile)
+	ator, err := oauth.NewAuthenticator(oauthFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if *initOauth {
-		os.Exit(0)
-	}
-
-	refreshHandle := func(w http.ResponseWriter, req *http.Request) {
-		err := ator.Refresh()
-		if err != nil {
-			fmt.Fprintf(w, "error refreshing access token: %v\n", err)
-		} else {
-			fmt.Fprintf(w, "access token refreshed\n",)
-		}
-	}
-
-	//plugin.Serve(&plugin.ServeOpts{
-	//	ProviderFunc: func() terraform.ResourceProvider {
-	//		return site24x7.Provider(ator)
-	//	},
-	//})
-
-	http.HandleFunc("/refresh", refreshHandle)
-
-	log.Fatal(http.ListenAndServe(":8484", nil))
+	plugin.Serve(&plugin.ServeOpts{
+		ProviderFunc: func() terraform.ResourceProvider {
+			return site24x7.Provider(ator)
+		},
+	})
 }
