@@ -43,7 +43,7 @@ func (tkns *tokens) persist(path string) error {
 	return ioutil.WriteFile(path, contents, 0644)
 }
 
-func load(path string)  (*tokens, error) {
+func load(path string) (*tokens, error) {
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -60,5 +60,5 @@ func load(path string)  (*tokens, error) {
 
 func (tkns *tokens) expired() bool {
 	now := time.Now().UnixNano() / 1e6
-	return now - tkns.TokenGenerationTime > int64(tkns.ExpiresInSec) * 1000
+	return now-tkns.TokenGenerationTime > int64(tkns.ExpiresInSec)*1000
 }

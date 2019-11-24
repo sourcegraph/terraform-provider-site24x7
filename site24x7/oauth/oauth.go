@@ -22,7 +22,7 @@ const (
 func setRequestHeaders(request *http.Request, accessToken string) {
 	request.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	request.Header.Set("Accept", "application/json; version=2.0")
-	request.Header.Set("Authorization", "Zoho-oauthtoken " + accessToken)
+	request.Header.Set("Authorization", "Zoho-oauthtoken "+accessToken)
 }
 
 func getURL(urlValues url.Values) string {
@@ -124,7 +124,7 @@ func (ator *Authenticator) refresh() error {
 func (ator *Authenticator) scheduleRefresh() {
 	go func() {
 		for {
-			timer := time.NewTimer(time.Second * time.Duration(math.Max(ator.tkns.ExpiresInSec - 10, 2)))
+			timer := time.NewTimer(time.Second * time.Duration(math.Max(ator.tkns.ExpiresInSec-10, 2)))
 			<-timer.C
 			err := ator.refresh()
 			if err != nil {
