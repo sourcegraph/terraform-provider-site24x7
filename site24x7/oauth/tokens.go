@@ -17,7 +17,7 @@ type tokens struct {
 	ExpiresInSec        float64 `json:"EXPIRES_IN_SEC"`
 }
 
-func (tkns tokens) refreshTokenURLValues() url.Values {
+func (tkns *tokens) refreshTokenURLValues() url.Values {
 	urlValues := url.Values{}
 	urlValues.Set("client_id", tkns.ClientId)
 	urlValues.Set("client_secret", tkns.ClientSecret)
@@ -26,7 +26,7 @@ func (tkns tokens) refreshTokenURLValues() url.Values {
 	return urlValues
 }
 
-func (tkns tokens) generatedCodeURLValues() url.Values {
+func (tkns *tokens) generatedCodeURLValues() url.Values {
 	urlValues := url.Values{}
 	urlValues.Set("client_id", tkns.ClientId)
 	urlValues.Set("client_secret", tkns.ClientSecret)
@@ -35,7 +35,7 @@ func (tkns tokens) generatedCodeURLValues() url.Values {
 	return urlValues
 }
 
-func (tkns tokens) persist(path string) error {
+func (tkns *tokens) persist(path string) error {
 	contents, err := json.MarshalIndent(tkns, "", " ")
 	if err != nil {
 		return err
@@ -43,20 +43,22 @@ func (tkns tokens) persist(path string) error {
 	return ioutil.WriteFile(path, contents, 0644)
 }
 
-func (tkns tokens) load(path string)  error {
+func load(path string)  (*tokens, error) {
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	var tkns tokens
 
 	err = json.Unmarshal(contents, &tkns)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &tkns, nil
 }
 
-func (tkns tokens) expired() bool {
+func (tkns *tokens) expired() bool {
 	now := time.Now().UnixNano() / 1e6
 	return now - tkns.TokenGenerationTime > int64(tkns.ExpiresInSec) * 1000
 }

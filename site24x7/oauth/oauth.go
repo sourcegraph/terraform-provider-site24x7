@@ -34,7 +34,7 @@ func getURL(urlValues url.Values) string {
 type Authenticator struct {
 	// Protects tkns.AccessToken (updated in refresh goroutine)
 	sync.RWMutex
-	tkns      tokens
+	tkns      *tokens
 	storePath string
 }
 
@@ -51,10 +51,6 @@ func (ator *Authenticator) getClient() *http.Client {
 		Timeout:   timeout,
 	}
 	return &client
-}
-
-func (ator *Authenticator) setDefaultHeaders(request *http.Request) {
-	request.Header.Set("Accept", "application/x-www-form-urlencoded")
 }
 
 func (ator *Authenticator) getAccessTokenFrom(urlToPost string) error {
@@ -80,9 +76,11 @@ func (ator *Authenticator) getAccessTokenFrom(urlToPost string) error {
 	ator.tkns.AccessToken, _ = result["access_token"].(string)
 	ator.Unlock()
 
+	ator.tkns.RefreshToken, _ = result["refresh_token"].(string)
 	ator.tkns.ExpiresInSec, _ = result["expires_in_sec"].(float64)
-	if ator.tkns.AccessToken == "" || ator.tkns.ExpiresInSec == 0 {
-		return errors.New("error while fetching access token from refresh token: empty token or no expiration")
+
+	if ator.tkns.AccessToken == "" || ator.tkns.ExpiresInSec == 0 || ator.tkns.RefreshToken == "" {
+		return errors.New("error while fetching access token: empty token or no expiration")
 	}
 	ator.tkns.TokenGenerationTime = time.Now().UnixNano() / 1e6
 	return ator.tkns.persist(ator.storePath)
@@ -165,10 +163,11 @@ func NewAuthenticator(path string) (*Authenticator, error) {
 		return nil, errors.New("update CLIENT_ID, CLIENT_SECRET and GENERATED_CODE in the file " + ator.storePath)
 	}
 
-	err = ator.tkns.load(ator.storePath)
+	tkns, err := load(ator.storePath)
 	if err != nil {
 		return nil, err
 	}
+	ator.tkns = tkns
 
 	if ator.tkns.AccessToken != "" {
 		ator.scheduleRefresh()

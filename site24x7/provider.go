@@ -11,7 +11,7 @@ import (
 func Provider(ator *oauth.Authenticator) terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"authtoken": &schema.Schema{
+			"oauthtoken": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: func() (i interface{}, err error) {
