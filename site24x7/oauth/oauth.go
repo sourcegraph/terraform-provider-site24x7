@@ -181,6 +181,12 @@ func NewAuthenticator(path string) (*Authenticator, error) {
 	ator.tkns = tkns
 
 	if ator.tkns.AccessToken != "" {
+		if ator.tkns.expired() {
+			err = ator.Refresh()
+			if err != nil {
+				return nil, err
+			}
+		}
 		ator.scheduleRefresh()
 		return ator, nil
 	}
