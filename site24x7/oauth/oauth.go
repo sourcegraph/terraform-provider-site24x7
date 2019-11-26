@@ -93,7 +93,7 @@ func (ator *Authenticator) getAccessTokenFrom(urlToPost string) error {
 		return errors.New("error while fetching access token: empty token or no expiration")
 	}
 	ator.tkns.TokenGenerationTime = time.Now().UnixNano() / 1e6
-	return ator.tkns.persist(ator.storePath)
+	return nil
 }
 
 func (ator *Authenticator) getAccessTokenFromRefreshToken() error {
@@ -119,9 +119,6 @@ func fileExists(path string) (bool, error) {
 }
 
 func (ator *Authenticator) Refresh() error {
-	if ator.tkns.AccessToken == "" {
-		return errors.New("no access token to Refresh")
-	}
 	err := ator.getAccessTokenFromRefreshToken()
 	if err != nil {
 		// if we failed to Refresh we want to try again in 30 secs
@@ -152,9 +149,15 @@ func (ator *Authenticator) AccessToken() string {
 	return ator.tkns.AccessToken
 }
 
-// NewAuthenticator creates an authenticator that will acquire an access token by reading it from the specified
-// file if it exists or by requesting it from Zoho and saving it to the specified file. It also schedules a
-// Refresh goroutine which will Refresh the token ten seconds before it expires.
+// NewAuthenticator creates an authenticator that will acquire an access token from Zoho using the JSON contents of the
+// file specified by the path. This function assumes the following content is in the file:
+// {
+//    "CLIENT_ID": "xxxx_your_client_id_xxxxx",
+//    "CLIENT_SECRET": "xxxx_your_client_secret_xxxxx",
+//    "REFRESH_TOKEN": "xxxx_your_refresh_token_xxxxx",
+// }
+// The function returns an authenticator that has an access token and that will refresh the access token if needed.
+// If an error occurred while obtaining the access token an error is returned.
 func NewAuthenticator(path string) (*Authenticator, error) {
 	ator := &Authenticator{
 		storePath: path,
@@ -165,13 +168,7 @@ func NewAuthenticator(path string) (*Authenticator, error) {
 	}
 
 	if !storeExists {
-		// persist a template so humans can add client id, client secret and generated code
-		var tkns tokens
-		err = tkns.persist(ator.storePath)
-		if err != nil {
-			return nil, err
-		}
-		return nil, errors.New("update CLIENT_ID, CLIENT_SECRET and GENERATED_CODE in the file " + ator.storePath)
+		return nil, errors.New("please add CLIENT_ID, CLIENT_SECRET and REFRESH_TOKEN to the file " + ator.storePath)
 	}
 
 	tkns, err := load(ator.storePath)
@@ -180,24 +177,35 @@ func NewAuthenticator(path string) (*Authenticator, error) {
 	}
 	ator.tkns = tkns
 
-	if ator.tkns.AccessToken != "" {
-		if ator.tkns.expired() {
-			err = ator.Refresh()
-			if err != nil {
-				return nil, err
-			}
-		}
-		ator.scheduleRefresh()
-		return ator, nil
+	if ator.tkns.ClientId == "" || ator.tkns.ClientSecret == "" || ator.tkns.RefreshToken == "" {
+		return nil, errors.New("please add CLIENT_ID, CLIENT_SECRET and REFRESH_TOKEN to the file " + ator.storePath)
 	}
 
-	if ator.tkns.ClientId == "" || ator.tkns.ClientSecret == "" || ator.tkns.GeneratedCode == "" {
-		return nil, errors.New("update CLIENT_ID, CLIENT_SECRET and GENERATED_CODE in the file " + ator.storePath)
+	if (ator.tkns.AccessToken != "" && ator.tkns.expired()) || ator.tkns.AccessToken == "" {
+		err = ator.Refresh()
+		if err != nil {
+			return nil, err
+		}
 	}
-	err = ator.setAccessTokenFromCode()
-	if err != nil {
-		return nil, err
-	}
+
 	ator.scheduleRefresh()
 	return ator, nil
+}
+
+// GenerateRefreshToken returns a refresh token given the specified client id, client secret and genrate code token.
+// If acquiring the refresh token fails then it returns an error.
+func GenerateRefreshToken(clientId, clientSecret, generateCode string) (string, error) {
+	ator := &Authenticator{
+		tkns:&tokens{},
+	}
+	ator.tkns.ClientId = clientId
+	ator.tkns.ClientSecret = clientSecret
+	ator.tkns.GeneratedCode = generateCode
+
+	err := ator.setAccessTokenFromCode()
+
+	if err != nil {
+		return "", err
+	}
+	return ator.tkns.RefreshToken, nil
 }

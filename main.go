@@ -1,37 +1,28 @@
 package main
 
 import (
-	"log"
-	"os"
-	"path/filepath"
-
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sourcegraph/terraform-provider-site24x7/site24x7"
-	"github.com/sourcegraph/terraform-provider-site24x7/site24x7/oauth"
 )
 
 // main is a plugin main, not a "real" main.
-// Please set the value of environment variable SITE24X7_AUTHTOKEN_FILE to a path to a JSDN file (file does not need to exist, it gets created if it doesn't).
-// This JSDN file stores the OAuth2 tokens from site24x7. If you don't set this environment variable it will use path `.size24x7_auth.json`.
+// Please set the value of environment variable `SITE24X7_AUTHTOKEN_FILE` to a path to a JSDN file
+// This JSDN file stores the client id, client secret and refresh token necessary to obtain OAuth2 access tokens from
+// site24x7. Expected is the following content for the JSON file:
+//
+// {
+//    "CLIENT_ID": "xxxx_your_client_id_xxxxx",
+//    "CLIENT_SECRET": "xxxx_your_client_secret_xxxxx",
+//    "REFRESH_TOKEN": "xxxx_your_refresh_token_xxxxx",
+// }
+//
+// If `SITE24X7_AUTHTOKEN_FILE` is not set it will use `site24x7-oauth.json` in the current working directory.
+// A helper command in site24x7/oauth/cmd/site24x7-oauth can be used to generate the JSON file.
 func main() {
-	oauthFile, ok := os.LookupEnv("SITE24X7_AUTHTOKEN_FILE")
-	if !ok {
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			log.Fatal(err)
-		}
-		oauthFile = filepath.Join(homeDir, ".size24x7_auth.json")
-	}
-
-	ator, err := oauth.NewAuthenticator(oauthFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	plugin.Serve(&plugin.ServeOpts{
 		ProviderFunc: func() terraform.ResourceProvider {
-			return site24x7.Provider(ator)
+			return site24x7.Provider()
 		},
 	})
 }
