@@ -28,6 +28,7 @@ func Provider() terraform.ResourceProvider {
 		ator, err := oauth.NewAuthenticator(oauthFile)
 		if err != nil {
 			oauthErr = err
+		} else {
 			authenticator = ator
 		}
 	}
