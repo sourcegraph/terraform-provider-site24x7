@@ -8,17 +8,23 @@ import (
 	"github.com/sourcegraph/terraform-provider-site24x7/site24x7/oauth"
 )
 
-func Provider(ator *oauth.Authenticator) terraform.ResourceProvider {
+func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"oauthtoken": &schema.Schema{
+			"oauth_client_id": {
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: func() (i interface{}, err error) {
-					accessToken := ator.AccessToken()
-					return accessToken, nil
-				},
-				Description: "Username for StatusCake Account.",
+				Description: "Zoho Site24x7 OAuth2 client id.",
+			},
+			"oauth_client_secret": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Zoho Site24x7 OAuth2 client secret.",
+			},
+			"oauth_refresh_token": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Zoho Site24x7 OAuth2 refresh token.",
 			},
 		},
 
@@ -31,8 +37,17 @@ func Provider(ator *oauth.Authenticator) terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+	clientId := d.Get("oauth_client_id").(string)
+	clientSecret := d.Get("oauth_client_secret").(string)
+	refreshToken := d.Get("oauth_refresh_token").(string)
+
+	ator, err := oauth.NewAuthenticator(clientId, clientSecret, refreshToken)
+	if err != nil {
+		return nil, err
+	}
+
 	h := make(http.Header)
-	h.Set("Authorization", "Zoho-oauthtoken "+d.Get("oauthtoken").(string))
+	h.Set("Authorization", "Zoho-oauthtoken "+ator.AccessToken())
 	return &http.Client{
 		Transport: &staticHeaderTransport{
 			base:   http.DefaultTransport,

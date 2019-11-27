@@ -1,8 +1,6 @@
 package oauth
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/url"
 	"time"
 )
@@ -33,29 +31,6 @@ func (tkns *tokens) generatedCodeURLValues() url.Values {
 	urlValues.Set("code", tkns.GeneratedCode)
 	urlValues.Set("grant_type", "authorization_code")
 	return urlValues
-}
-
-func (tkns *tokens) persist(path string) error {
-	contents, err := json.MarshalIndent(tkns, "", " ")
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile(path, contents, 0644)
-}
-
-func load(path string) (*tokens, error) {
-	contents, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var tkns tokens
-
-	err = json.Unmarshal(contents, &tkns)
-	if err != nil {
-		return nil, err
-	}
-	return &tkns, nil
 }
 
 func (tkns *tokens) expired() bool {
