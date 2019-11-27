@@ -1,7 +1,6 @@
 package site24x7
 
 import (
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -29,7 +28,4 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("SITE24X7_AUTHTOKEN_FILE"); v == "" {
-		t.Fatal("SITE24X7_AUTHTOKEN_FILE must be set for acceptance tests")
-	}
 }
