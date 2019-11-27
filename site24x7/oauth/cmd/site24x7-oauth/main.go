@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -10,13 +9,13 @@ import (
 )
 
 type oauthData struct {
-	ClientId            string  `json:"CLIENT_ID"`
-	ClientSecret        string  `json:"CLIENT_SECRET"`
-	RefreshToken        string  `json:"REFRESH_TOKEN"`
+	ClientId     string
+	ClientSecret string
+	RefreshToken string
 }
 
 var (
-	clientId = flag.String("clientId", "", "(required) client id")
+	clientId     = flag.String("clientId", "", "(required) client id")
 	clientSecret = flag.String("clientSecret", "", "(required) client secret")
 	generateCode = flag.String("generateCode", "", "(required) generate code token")
 )
@@ -42,12 +41,7 @@ func main() {
 		RefreshToken: refreshToken,
 	}
 
-	contents, err := json.MarshalIndent(oad, "", " ")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-
-	}
-
-	fmt.Println(string(contents))
+	fmt.Println("oauth_client_id = " + oad.ClientId)
+	fmt.Println("oauth_client_secret = " + oad.ClientSecret)
+	fmt.Println("oauth_refresh_token = " + oad.RefreshToken)
 }

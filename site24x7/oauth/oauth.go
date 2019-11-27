@@ -5,11 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math"
 	"net/http"
 	"net/url"
-	"os"
-	"sync"
 	"time"
 )
 
@@ -32,10 +29,7 @@ func getURL(urlValues url.Values) string {
 }
 
 type Authenticator struct {
-	// Protects tkns.AccessToken (updated in Refresh goroutine)
-	sync.RWMutex
-	tkns      *tokens
-	storePath string
+	tkns *tokens
 }
 
 func (ator *Authenticator) getClient() *http.Client {
@@ -78,10 +72,7 @@ func (ator *Authenticator) getAccessTokenFrom(urlToPost string) error {
 		return errors.New(respErr)
 	}
 
-	ator.Lock()
 	ator.tkns.AccessToken, _ = result["access_token"].(string)
-	ator.Unlock()
-
 	ator.tkns.ExpiresInSec, _ = result["expires_in_sec"].(float64)
 
 	refreshToken, _ := result["refresh_token"].(string)
@@ -104,91 +95,38 @@ func (ator *Authenticator) setAccessTokenFromCode() error {
 	return ator.getAccessTokenFrom(getURL(ator.tkns.generatedCodeURLValues()))
 }
 
-func fileExists(path string) (bool, error) {
-	fi, err := os.Lstat(path)
-	if err == nil {
-		if fi.IsDir() {
-			return false, errors.New(path + " is a directory")
-		}
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
-
-func (ator *Authenticator) Refresh() error {
+func (ator *Authenticator) refresh() error {
 	err := ator.getAccessTokenFromRefreshToken()
 	if err != nil {
-		// if we failed to Refresh we want to try again in 30 secs
+		// if we failed to refresh we want to try again in 30 secs
 		ator.tkns.ExpiresInSec = 30
 		return err
 	}
 	return nil
 }
 
-func (ator *Authenticator) scheduleRefresh() {
-	go func() {
-		for {
-			timer := time.NewTimer(time.Second * time.Duration(math.Max(ator.tkns.ExpiresInSec-300, 5)))
-			<-timer.C
-			err := ator.Refresh()
-			if err != nil {
-				fmt.Printf("failed to Refresh access token: %b", err)
-			}
-		}
-	}()
-}
-
 // AccessToken returns the access token.
 func (ator *Authenticator) AccessToken() string {
-	ator.RLock()
-	defer ator.RUnlock()
-
 	return ator.tkns.AccessToken
 }
 
-// NewAuthenticator creates an authenticator that will acquire an access token from Zoho using the JSON contents of the
-// file specified by the path. This function assumes the following content is in the file:
-// {
-//    "CLIENT_ID": "xxxx_your_client_id_xxxxx",
-//    "CLIENT_SECRET": "xxxx_your_client_secret_xxxxx",
-//    "REFRESH_TOKEN": "xxxx_your_refresh_token_xxxxx",
-// }
-// The function returns an authenticator that has an access token and that will refresh the access token if needed.
+// NewAuthenticator creates an authenticator that will acquire an access token from Zoho using the specified
+// client id, client secret and refresh token.
 // If an error occurred while obtaining the access token an error is returned.
-func NewAuthenticator(path string) (*Authenticator, error) {
+func NewAuthenticator(clientId, clientSecret, refreshToken string) (*Authenticator, error) {
 	ator := &Authenticator{
-		storePath: path,
+		tkns: &tokens{
+			ClientId:     clientId,
+			ClientSecret: clientSecret,
+			RefreshToken: refreshToken,
+		},
 	}
-	storeExists, err := fileExists(ator.storePath)
+
+	err := ator.refresh()
 	if err != nil {
 		return nil, err
 	}
 
-	if !storeExists {
-		return nil, errors.New("please add CLIENT_ID, CLIENT_SECRET and REFRESH_TOKEN to the file " + ator.storePath)
-	}
-
-	tkns, err := load(ator.storePath)
-	if err != nil {
-		return nil, err
-	}
-	ator.tkns = tkns
-
-	if ator.tkns.ClientId == "" || ator.tkns.ClientSecret == "" || ator.tkns.RefreshToken == "" {
-		return nil, errors.New("please add CLIENT_ID, CLIENT_SECRET and REFRESH_TOKEN to the file " + ator.storePath)
-	}
-
-	if (ator.tkns.AccessToken != "" && ator.tkns.expired()) || ator.tkns.AccessToken == "" {
-		err = ator.Refresh()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	ator.scheduleRefresh()
 	return ator, nil
 }
 
@@ -196,7 +134,7 @@ func NewAuthenticator(path string) (*Authenticator, error) {
 // If acquiring the refresh token fails then it returns an error.
 func GenerateRefreshToken(clientId, clientSecret, generateCode string) (string, error) {
 	ator := &Authenticator{
-		tkns:&tokens{},
+		tkns: &tokens{},
 	}
 	ator.tkns.ClientId = clientId
 	ator.tkns.ClientSecret = clientSecret
