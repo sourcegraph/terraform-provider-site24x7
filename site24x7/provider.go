@@ -14,16 +14,19 @@ func Provider() terraform.ResourceProvider {
 			"oauth_client_id": {
 				Type:        schema.TypeString,
 				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SITE24X7_CLIENT_ID", nil),
 				Description: "Zoho Site24x7 OAuth2 client id.",
 			},
 			"oauth_client_secret": {
 				Type:        schema.TypeString,
 				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SITE24X7_CLIENT_SECRET", nil),
 				Description: "Zoho Site24x7 OAuth2 client secret.",
 			},
 			"oauth_refresh_token": {
 				Type:        schema.TypeString,
 				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SITE24X7_REFRESH_TOKEN", nil),
 				Description: "Zoho Site24x7 OAuth2 refresh token.",
 			},
 		},
