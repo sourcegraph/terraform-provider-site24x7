@@ -13,6 +13,12 @@ provider "site24x7" {
 }
 ```
 
+You can choose to specify the OAuth2 values as environment variables instead of including them in the provider section:
+
+* `SITE24X7_CLIENT_ID`
+* `SITE24X7_CLIENT_SECRET`
+* `SITE24X7_REFRESH_TOKEN`
+
 ## Installation
 
 ```code
