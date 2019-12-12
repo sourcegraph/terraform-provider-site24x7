@@ -21,7 +21,7 @@ You can choose to specify the OAuth2 values as environment variables instead of 
 
 ## Installation
 
-```code
+```shellsession
 $ brew install terraform
 $ go get -u github.com/sourcegraph/terraform-provider-site24x7 && cp $GOPATH/bin/terraform-provider-site24x7 .
 $ echo 'providers { site24x7 = "terraform-provider-site24x7" }' >> ~/.terraformrc
