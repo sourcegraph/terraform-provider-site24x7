@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -439,16 +440,19 @@ func websiteMonitorExists(d *schema.ResourceData, meta interface{}) (bool, error
 
 func fetchWebsiteMonitorExists(client *http.Client, id string) (bool, error) {
 	resp, err := client.Get("https://www.site24x7.com/api/monitors/" + id)
+	log.Printf(" === calling https://www.site24x7.com/api/monitors/%s \n",id)
 	if err != nil {
 		return false, err
 	}
 	defer resp.Body.Close()
-
+	log.Printf("with response code: %d",resp.StatusCode)
 	switch resp.StatusCode {
 	case http.StatusOK:
 		return true, nil
 	case http.StatusNotFound:
 		return false, nil
+	case http.StatusUnauthorized:
+		return false, parseAPIError(resp.Body)
 	default:
 		return false, parseAPIError(resp.Body)
 	}
@@ -463,6 +467,7 @@ func defaultLocationProfile(client *http.Client) (string, error) {
 	if err := doGetRequest(client, "https://www.site24x7.com/api/location_profiles", &apiResp); err != nil {
 		return "", err
 	}
+	log.Printf(" === calling /api/location_profiles \n")
 	return apiResp.Data[0].ProfileID, nil
 }
 
@@ -475,6 +480,7 @@ func defaultNotificationProfile(client *http.Client) (string, error) {
 	if err := doGetRequest(client, "https://www.site24x7.com/api/notification_profiles", &apiResp); err != nil {
 		return "", err
 	}
+	log.Printf(" === calling /api/notification_profiles\n")
 	return apiResp.Data[0].ProfileID, nil
 }
 
@@ -486,6 +492,7 @@ func defaultThresholdProfile(client *http.Client, monitorType string) (string, e
 		} `json:"data"`
 	}
 	if err := doGetRequest(client, "https://www.site24x7.com/api/threshold_profiles", &apiResp); err != nil {
+		log.Printf(" === calling /api/threshold_profiles\n")
 		return "", err
 	}
 	for _, p := range apiResp.Data {
@@ -505,6 +512,7 @@ func defaultUserGroup(client *http.Client) (string, error) {
 	if err := doGetRequest(client, "https://www.site24x7.com/api/user_groups", &apiResp); err != nil {
 		return "", err
 	}
+	log.Printf(" === calling /api/user_groups\n")
 	return apiResp.Data[0].UserGroupID, nil
 }
 
@@ -514,7 +522,7 @@ func doGetRequest(client *http.Client, url string, data interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
-
+	log.Printf(" === Response code: %d : %s\n",resp.StatusCode,resp.Status)
 	if resp.StatusCode != http.StatusOK {
 		return parseAPIError(resp.Body)
 	}

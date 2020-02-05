@@ -80,8 +80,12 @@ func (ator *Authenticator) getAccessTokenFrom(urlToPost string) error {
 		ator.tkns.RefreshToken = refreshToken
 	}
 
-	if ator.tkns.AccessToken == "" || ator.tkns.ExpiresInSec == 0 {
-		return errors.New("error while fetching access token: empty token or no expiration")
+	if ator.tkns.AccessToken == "" {
+		return errors.New("error while fetching access token: empty token")
+	}
+
+	if ator.tkns.ExpiresInSec == 0 {
+		return errors.New("error while fetching access token: no expiration")
 	}
 	ator.tkns.TokenGenerationTime = time.Now().UnixNano() / 1e6
 	return nil
@@ -130,7 +134,7 @@ func NewAuthenticator(clientId, clientSecret, refreshToken string) (*Authenticat
 	return ator, nil
 }
 
-// GenerateRefreshToken returns a refresh token given the specified client id, client secret and genrate code token.
+// GenerateRefreshToken returns a refresh token given the specified client id, client secret and generate code token.
 // If acquiring the refresh token fails then it returns an error.
 func GenerateRefreshToken(clientId, clientSecret, generateCode string) (string, error) {
 	ator := &Authenticator{

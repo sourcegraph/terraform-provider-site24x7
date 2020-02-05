@@ -1,14 +1,17 @@
 package site24x7
 
 import (
-	"net/http"
-
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sourcegraph/terraform-provider-site24x7/site24x7/oauth"
+	"log"
+	"net/http"
 )
 
 func Provider() terraform.ResourceProvider {
+
+	log.Printf(" === Running in ResourceProvider\n")
+
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"oauth_client_id": {
@@ -44,6 +47,11 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	clientSecret := d.Get("oauth_client_secret").(string)
 	refreshToken := d.Get("oauth_refresh_token").(string)
 
+	log.Printf(" === Running in providerConfigure \n")
+	log.Printf("oauth_cliend_id: %s\n", clientId)
+	log.Printf("oauth_cliend_secret: %s\n", clientSecret)
+	log.Printf("oauth_refresh_token: %s\n", refreshToken)
+
 	ator, err := oauth.NewAuthenticator(clientId, clientSecret, refreshToken)
 	if err != nil {
 		return nil, err
@@ -51,6 +59,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	h := make(http.Header)
 	h.Set("Authorization", "Zoho-oauthtoken "+ator.AccessToken())
+	log.Printf("Header sent: %s",h)
 	return &http.Client{
 		Transport: &staticHeaderTransport{
 			base:   http.DefaultTransport,
@@ -68,5 +77,6 @@ func (t *staticHeaderTransport) RoundTrip(req *http.Request) (*http.Response, er
 	for k, v := range t.header {
 		req.Header[k] = v
 	}
+	log.Printf("RoundTrip Header: %s\n", req.Header)
 	return t.base.RoundTrip(req)
 }
