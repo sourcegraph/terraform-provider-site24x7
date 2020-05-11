@@ -105,7 +105,7 @@ func (d *decoderDict) writeMatch(dist int64, length int) error {
 			p = p[:length]
 		}
 		if _, err := d.buf.Write(p); err != nil {
-			panic(fmt.Errorf("d.buf.Write returned error %s", err))
+			panic(fmt.Errorf("d.buf.Write returned error %w", err))
 		}
 		length -= len(p)
 	}

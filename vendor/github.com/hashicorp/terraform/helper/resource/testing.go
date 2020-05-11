@@ -466,7 +466,7 @@ func Test(t TestT, c TestCase) {
 
 	logWriter, err := LogOutput(t)
 	if err != nil {
-		t.Error(fmt.Errorf("error setting up logging: %s", err))
+		t.Error(fmt.Errorf("error setting up logging: %w", err))
 	}
 	log.SetOutput(logWriter)
 
@@ -811,7 +811,7 @@ func testConfig(opts terraform.ContextOpts, step TestStep) (*configs.Config, err
 
 	cfgPath, err := ioutil.TempDir("", "tf-test")
 	if err != nil {
-		return nil, fmt.Errorf("Error creating temporary directory for config: %s", err)
+		return nil, fmt.Errorf("Error creating temporary directory for config: %w", err)
 	}
 
 	if step.PreventDiskCleanup {
@@ -823,14 +823,14 @@ func testConfig(opts terraform.ContextOpts, step TestStep) (*configs.Config, err
 	// Write the main configuration file
 	err = ioutil.WriteFile(filepath.Join(cfgPath, "main.tf"), []byte(step.Config), os.ModePerm)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating temporary file for config: %s", err)
+		return nil, fmt.Errorf("Error creating temporary file for config: %w", err)
 	}
 
 	// Create directory for our child modules, if any.
 	modulesDir := filepath.Join(cfgPath, ".modules")
 	err = os.Mkdir(modulesDir, os.ModePerm)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating child modules directory: %s", err)
+		return nil, fmt.Errorf("Error creating child modules directory: %w", err)
 	}
 
 	inst := initwd.NewModuleInstaller(modulesDir, nil)
@@ -843,7 +843,7 @@ func testConfig(opts terraform.ContextOpts, step TestStep) (*configs.Config, err
 		ModulesDir: modulesDir,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create config loader: %s", err)
+		return nil, fmt.Errorf("failed to create config loader: %w", err)
 	}
 
 	config, configDiags := loader.LoadConfig(cfgPath)

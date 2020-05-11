@@ -256,7 +256,7 @@ func (d *decoder) Read(p []byte) (n int, err error) {
 		// Read of decoder dict never returns an error.
 		k, err = d.Dict.Read(p[n:])
 		if err != nil {
-			panic(fmt.Errorf("dictionary read error %s", err))
+			panic(fmt.Errorf("dictionary read error %w", err))
 		}
 		if k == 0 && d.eos {
 			return n, io.EOF

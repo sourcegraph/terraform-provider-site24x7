@@ -41,7 +41,7 @@ var ElementFunc = function.New(&function.Spec{
 			err := gocty.FromCtyValue(args[1], &index)
 			if err != nil {
 				// e.g. fractional number where whole number is required
-				return cty.DynamicPseudoType, fmt.Errorf("invalid index: %s", err)
+				return cty.DynamicPseudoType, fmt.Errorf("invalid index: %w", err)
 			}
 			if len(etys) == 0 {
 				return cty.DynamicPseudoType, errors.New("cannot use element function with an empty list")
@@ -57,7 +57,7 @@ var ElementFunc = function.New(&function.Spec{
 		err := gocty.FromCtyValue(args[1], &index)
 		if err != nil {
 			// can't happen because we checked this in the Type function above
-			return cty.DynamicVal, fmt.Errorf("invalid index: %s", err)
+			return cty.DynamicVal, fmt.Errorf("invalid index: %w", err)
 		}
 
 		if !args[0].IsKnown() {
@@ -392,7 +392,7 @@ var ChunklistFunc = function.New(&function.Spec{
 		var size int
 		err = gocty.FromCtyValue(args[1], &size)
 		if err != nil {
-			return cty.NilVal, fmt.Errorf("invalid index: %s", err)
+			return cty.NilVal, fmt.Errorf("invalid index: %w", err)
 		}
 
 		if size < 0 {

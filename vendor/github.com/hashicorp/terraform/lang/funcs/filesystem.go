@@ -179,7 +179,7 @@ func MakeFileExistsFunc(baseDir string) function.Function {
 			path := args[0].AsString()
 			path, err := homedir.Expand(path)
 			if err != nil {
-				return cty.UnknownVal(cty.Bool), fmt.Errorf("failed to expand ~: %s", err)
+				return cty.UnknownVal(cty.Bool), fmt.Errorf("failed to expand ~: %w", err)
 			}
 
 			if !filepath.IsAbs(path) {
@@ -256,7 +256,7 @@ var PathExpandFunc = function.New(&function.Spec{
 func readFileBytes(baseDir, path string) ([]byte, error) {
 	path, err := homedir.Expand(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to expand ~: %s", err)
+		return nil, fmt.Errorf("failed to expand ~: %w", err)
 	}
 
 	if !filepath.IsAbs(path) {

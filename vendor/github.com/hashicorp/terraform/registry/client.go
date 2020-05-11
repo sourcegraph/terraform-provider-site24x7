@@ -185,7 +185,7 @@ func (c *Client) ModuleLocation(module *regsrc.Module, version string) (string, 
 	// there should be no body, but save it for logging
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("error reading response body from registry: %s", err)
+		return "", fmt.Errorf("error reading response body from registry: %w", err)
 	}
 
 	switch resp.StatusCode {

@@ -156,7 +156,7 @@ func (h Hostname) ForDisplay() string {
 	if err != nil {
 		// Should never happen, since type Hostname indicates that a string
 		// passed through our validation rules.
-		panic(fmt.Errorf("ForDisplay called on invalid Hostname: %s", err))
+		panic(fmt.Errorf("ForDisplay called on invalid Hostname: %w", err))
 	}
 	return result + portPortion
 }

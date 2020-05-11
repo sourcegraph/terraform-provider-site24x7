@@ -953,7 +953,7 @@ func (s *OutputState) deepcopy() *OutputState {
 
 	stateCopy, err := copystructure.Config{Lock: true}.Copy(s)
 	if err != nil {
-		panic(fmt.Errorf("Error copying output value: %s", err))
+		panic(fmt.Errorf("Error copying output value: %w", err))
 	}
 
 	return stateCopy.(*OutputState)
@@ -2160,7 +2160,7 @@ func WriteState(d *State, dst io.Writer) error {
 	// Encode the data in a human-friendly way
 	data, err := json.MarshalIndent(d, "", "    ")
 	if err != nil {
-		return fmt.Errorf("Failed to encode state: %s", err)
+		return fmt.Errorf("Failed to encode state: %w", err)
 	}
 
 	// We append a newline to the data because MarshalIndent doesn't

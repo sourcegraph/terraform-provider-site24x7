@@ -24,7 +24,7 @@ func (val Value) GobEncode() ([]byte, error) {
 
 	err := enc.Encode(gv)
 	if err != nil {
-		return nil, fmt.Errorf("error encoding cty.Value: %s", err)
+		return nil, fmt.Errorf("error encoding cty.Value: %w", err)
 	}
 
 	return buf.Bytes(), nil
@@ -40,7 +40,7 @@ func (val *Value) GobDecode(buf []byte) error {
 	var gv gobValue
 	err := dec.Decode(&gv)
 	if err != nil {
-		return fmt.Errorf("error decoding cty.Value: %s", err)
+		return fmt.Errorf("error decoding cty.Value: %w", err)
 	}
 	if gv.Version != 0 {
 		return fmt.Errorf("unsupported cty.Value encoding version %d; only 0 is supported", gv.Version)
@@ -73,7 +73,7 @@ func (t Type) GobEncode() ([]byte, error) {
 
 	err := enc.Encode(gt)
 	if err != nil {
-		return nil, fmt.Errorf("error encoding cty.Type: %s", err)
+		return nil, fmt.Errorf("error encoding cty.Type: %w", err)
 	}
 
 	return buf.Bytes(), nil
@@ -89,7 +89,7 @@ func (t *Type) GobDecode(buf []byte) error {
 	var gt gobType
 	err := dec.Decode(&gt)
 	if err != nil {
-		return fmt.Errorf("error decoding cty.Type: %s", err)
+		return fmt.Errorf("error decoding cty.Type: %w", err)
 	}
 	if gt.Version != 0 {
 		return fmt.Errorf("unsupported cty.Type encoding version %d; only 0 is supported", gt.Version)

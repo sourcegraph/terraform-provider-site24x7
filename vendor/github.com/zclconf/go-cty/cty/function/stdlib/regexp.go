@@ -155,7 +155,7 @@ func regexPatternResultType(pattern string) (cty.Type, error) {
 	case error:
 		// Should never happen, since all regexp compile errors should
 		// be resyntax.Error, but just in case...
-		return cty.NilType, fmt.Errorf("error parsing pattern: %s", err)
+		return cty.NilType, fmt.Errorf("error parsing pattern: %w", err)
 	}
 
 	allNames := re.SubexpNames()[1:]
