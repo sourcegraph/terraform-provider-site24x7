@@ -535,7 +535,7 @@ func (c *Client) Start() (addr net.Addr, err error) {
 
 	if c.config.SecureConfig != nil {
 		if ok, err := c.config.SecureConfig.Check(cmd.Path); err != nil {
-			return nil, fmt.Errorf("error verifying checksum: %s", err)
+			return nil, fmt.Errorf("error verifying checksum: %w", err)
 		} else if !ok {
 			return nil, ErrChecksumsDoNotMatch
 		}
@@ -684,7 +684,7 @@ func (c *Client) Start() (addr net.Addr, err error) {
 			var coreProtocol int64
 			coreProtocol, err = strconv.ParseInt(parts[0], 10, 0)
 			if err != nil {
-				err = fmt.Errorf("Error parsing core protocol version: %s", err)
+				err = fmt.Errorf("Error parsing core protocol version: %w", err)
 				return
 			}
 
@@ -745,7 +745,7 @@ func (c *Client) Start() (addr net.Addr, err error) {
 		if len(parts) >= 6 && len(parts[5]) > 50 {
 			err := c.loadServerCert(parts[5])
 			if err != nil {
-				return nil, fmt.Errorf("error parsing server cert: %s", err)
+				return nil, fmt.Errorf("error parsing server cert: %w", err)
 			}
 		}
 	}

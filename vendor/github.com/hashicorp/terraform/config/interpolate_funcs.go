@@ -268,7 +268,7 @@ func interpolationFuncCidrHost() ast.Function {
 			hostNum := args[1].(int)
 			_, network, err := net.ParseCIDR(args[0].(string))
 			if err != nil {
-				return nil, fmt.Errorf("invalid CIDR expression: %s", err)
+				return nil, fmt.Errorf("invalid CIDR expression: %w", err)
 			}
 
 			ip, err := cidr.Host(network, hostNum)
@@ -293,7 +293,7 @@ func interpolationFuncCidrNetmask() ast.Function {
 		Callback: func(args []interface{}) (interface{}, error) {
 			_, network, err := net.ParseCIDR(args[0].(string))
 			if err != nil {
-				return nil, fmt.Errorf("invalid CIDR expression: %s", err)
+				return nil, fmt.Errorf("invalid CIDR expression: %w", err)
 			}
 
 			return net.IP(network.Mask).String(), nil
@@ -318,7 +318,7 @@ func interpolationFuncCidrSubnet() ast.Function {
 			subnetNum := args[2].(int)
 			_, network, err := net.ParseCIDR(args[0].(string))
 			if err != nil {
-				return nil, fmt.Errorf("invalid CIDR expression: %s", err)
+				return nil, fmt.Errorf("invalid CIDR expression: %w", err)
 			}
 
 			// For portability with 32-bit systems where the subnet number

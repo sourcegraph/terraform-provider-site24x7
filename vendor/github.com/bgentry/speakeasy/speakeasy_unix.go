@@ -56,7 +56,7 @@ func getPassword() (password string, err error) {
 	if err == nil {
 		password = strings.TrimSpace(line)
 	} else {
-		err = fmt.Errorf("failed during password entry: %s", err)
+		err = fmt.Errorf("failed during password entry: %w", err)
 	}
 
 	return password, err
@@ -66,7 +66,7 @@ func getPassword() (password string, err error) {
 func echoOff(fd []uintptr) (int, error) {
 	pid, err := syscall.ForkExec(sttyArg0, sttyArgvEOff, &syscall.ProcAttr{Dir: "", Files: fd})
 	if err != nil {
-		return 0, fmt.Errorf("failed turning off console echo for password entry:\n\t%s", err)
+		return 0, fmt.Errorf("failed turning off console echo for password entry:\n\t%w", err)
 	}
 	return pid, nil
 }

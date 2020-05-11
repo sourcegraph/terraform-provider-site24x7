@@ -60,7 +60,7 @@ var IndexFunc = function.New(&function.Spec{
 			var idx int
 			err := gocty.FromCtyValue(key, &idx)
 			if err != nil {
-				return cty.NilType, fmt.Errorf("invalid key for tuple: %s", err)
+				return cty.NilType, fmt.Errorf("invalid key for tuple: %w", err)
 			}
 
 			etys := collTy.TupleElementTypes()

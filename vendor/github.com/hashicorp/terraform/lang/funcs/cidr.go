@@ -31,7 +31,7 @@ var CidrHostFunc = function.New(&function.Spec{
 		}
 		_, network, err := net.ParseCIDR(args[0].AsString())
 		if err != nil {
-			return cty.UnknownVal(cty.String), fmt.Errorf("invalid CIDR expression: %s", err)
+			return cty.UnknownVal(cty.String), fmt.Errorf("invalid CIDR expression: %w", err)
 		}
 
 		ip, err := cidr.Host(network, hostNum)
@@ -56,7 +56,7 @@ var CidrNetmaskFunc = function.New(&function.Spec{
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
 		_, network, err := net.ParseCIDR(args[0].AsString())
 		if err != nil {
-			return cty.UnknownVal(cty.String), fmt.Errorf("invalid CIDR expression: %s", err)
+			return cty.UnknownVal(cty.String), fmt.Errorf("invalid CIDR expression: %w", err)
 		}
 
 		return cty.StringVal(net.IP(network.Mask).String()), nil
@@ -93,7 +93,7 @@ var CidrSubnetFunc = function.New(&function.Spec{
 
 		_, network, err := net.ParseCIDR(args[0].AsString())
 		if err != nil {
-			return cty.UnknownVal(cty.String), fmt.Errorf("invalid CIDR expression: %s", err)
+			return cty.UnknownVal(cty.String), fmt.Errorf("invalid CIDR expression: %w", err)
 		}
 
 		// For portability with 32-bit systems where the subnet number

@@ -255,7 +255,7 @@ func upgradeInstanceObjectV3ToV4(rsOld *resourceStateV2, isOld *instanceStateV2,
 		if err != nil {
 			// This shouldn't happen, because the Meta values all came from JSON
 			// originally anyway.
-			return nil, fmt.Errorf("cannot serialize private instance object data: %s", err)
+			return nil, fmt.Errorf("cannot serialize private instance object data: %w", err)
 		}
 	}
 

@@ -33,7 +33,7 @@ func (s Set) GobEncode() ([]byte, error) {
 	enc := gob.NewEncoder(buf)
 	err := enc.Encode(gs)
 	if err != nil {
-		return nil, fmt.Errorf("error encoding set.Set: %s", err)
+		return nil, fmt.Errorf("error encoding set.Set: %w", err)
 	}
 
 	return buf.Bytes(), nil
@@ -48,7 +48,7 @@ func (s *Set) GobDecode(buf []byte) error {
 	var gs gobSet
 	err := dec.Decode(&gs)
 	if err != nil {
-		return fmt.Errorf("error decoding set.Set: %s", err)
+		return fmt.Errorf("error decoding set.Set: %w", err)
 	}
 	if gs.Version != 0 {
 		return fmt.Errorf("unsupported set.Set encoding version %d; need 0", gs.Version)

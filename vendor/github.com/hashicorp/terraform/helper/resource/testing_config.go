@@ -104,11 +104,11 @@ func testStep(opts terraform.ContextOpts, state *terraform.State, step TestStep)
 		if step.Check != nil {
 			if step.Destroy {
 				if err := step.Check(stateBeforeApplication); err != nil {
-					return state, fmt.Errorf("Check failed: %s", err)
+					return state, fmt.Errorf("Check failed: %w", err)
 				}
 			} else {
 				if err := step.Check(state); err != nil {
-					return state, fmt.Errorf("Check failed: %s", err)
+					return state, fmt.Errorf("Check failed: %w", err)
 				}
 			}
 		}

@@ -325,7 +325,7 @@ func (s *Schema) DefaultValue() (interface{}, error) {
 	if s.DefaultFunc != nil {
 		defaultValue, err := s.DefaultFunc()
 		if err != nil {
-			return nil, fmt.Errorf("error loading default: %s", err)
+			return nil, fmt.Errorf("error loading default: %w", err)
 		}
 		return defaultValue, nil
 	}

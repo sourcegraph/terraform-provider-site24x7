@@ -139,14 +139,14 @@ func loadModule(dir string) (*Module, Diagnostics) {
 						if err != nil {
 							// Should never happen, since all possible known
 							// values have a JSON mapping.
-							panic(fmt.Errorf("failed to serialize default value as JSON: %s", err))
+							panic(fmt.Errorf("failed to serialize default value as JSON: %w", err))
 						}
 						var def interface{}
 						err = json.Unmarshal(valJSON, &def)
 						if err != nil {
 							// Again should never happen, because valJSON is
 							// guaranteed valid by ctyjson.Marshal.
-							panic(fmt.Errorf("failed to re-parse default value from JSON: %s", err))
+							panic(fmt.Errorf("failed to re-parse default value from JSON: %w", err))
 						}
 						v.Default = def
 					}
