@@ -202,7 +202,9 @@ func (ignore) String() string                                                   
 // be evaluated due to unexported fields.
 type invalid struct{ core }
 
-func (invalid) filter(_ *state, _, _ reflect.Value, _ reflect.Type) applicableOption { return invalid{} }
+func (invalid) filter(_ *state, _, _ reflect.Value, _ reflect.Type) applicableOption {
+	return invalid{}
+}
 func (invalid) apply(s *state, _, _ reflect.Value) {
 	const help = "consider using AllowUnexported or cmpopts.IgnoreUnexported"
 	panic(fmt.Sprintf("cannot handle unexported field: %#v\n%s", s.curPath, help))
