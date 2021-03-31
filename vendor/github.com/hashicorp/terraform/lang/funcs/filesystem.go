@@ -266,7 +266,7 @@ func readFileBytes(baseDir, path string) ([]byte, error) {
 	// Ensure that the path is canonical for the host OS
 	path = filepath.Clean(path)
 
-	src, err := ioutil.ReadFile(path)
+	src, err := os.ReadFile(path)
 	if err != nil {
 		// ReadFile does not return Terraform-user-friendly error
 		// messages, so we'll provide our own.

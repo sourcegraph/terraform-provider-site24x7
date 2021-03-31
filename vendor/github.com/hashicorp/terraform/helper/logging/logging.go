@@ -22,7 +22,7 @@ var ValidLevels = []logutils.LogLevel{"TRACE", "DEBUG", "INFO", "WARN", "ERROR"}
 
 // LogOutput determines where we should send logs (if anywhere) and the log level.
 func LogOutput() (logOutput io.Writer, err error) {
-	logOutput = ioutil.Discard
+	logOutput = io.Discard
 
 	logLevel := LogLevel()
 	if logLevel == "" {
@@ -58,7 +58,7 @@ func SetOutput() {
 	}
 
 	if out == nil {
-		out = ioutil.Discard
+		out = io.Discard
 	}
 
 	log.SetOutput(out)

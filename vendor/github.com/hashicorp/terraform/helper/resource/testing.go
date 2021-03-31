@@ -393,7 +393,7 @@ type TestStep struct {
 const EnvLogPathMask = "TF_LOG_PATH_MASK"
 
 func LogOutput(t TestT) (logOutput io.Writer, err error) {
-	logOutput = ioutil.Discard
+	logOutput = io.Discard
 
 	logLevel := logging.LogLevel()
 	if logLevel == "" {
@@ -809,7 +809,7 @@ func testConfig(opts terraform.ContextOpts, step TestStep) (*configs.Config, err
 		step.PreConfig()
 	}
 
-	cfgPath, err := ioutil.TempDir("", "tf-test")
+	cfgPath, err := os.MkdirTemp("", "tf-test")
 	if err != nil {
 		return nil, fmt.Errorf("Error creating temporary directory for config: %s", err)
 	}
@@ -821,7 +821,7 @@ func testConfig(opts terraform.ContextOpts, step TestStep) (*configs.Config, err
 	}
 
 	// Write the main configuration file
-	err = ioutil.WriteFile(filepath.Join(cfgPath, "main.tf"), []byte(step.Config), os.ModePerm)
+	err = os.WriteFile(filepath.Join(cfgPath, "main.tf"), []byte(step.Config), os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("Error creating temporary file for config: %s", err)
 	}

@@ -232,7 +232,7 @@ func (d *Disco) discover(hostname svchost.Hostname) (*Host, error) {
 	// size, but we'll at least prevent reading the entire thing into memory.
 	lr := io.LimitReader(resp.Body, maxDiscoDocBytes)
 
-	servicesBytes, err := ioutil.ReadAll(lr)
+	servicesBytes, err := io.ReadAll(lr)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading discovery document body: %v", err)
 	}

@@ -68,7 +68,7 @@ func (m *Module) init(diags Diagnostics) {
 }
 
 func dirFiles(dir string) (primary []string, diags hcl.Diagnostics) {
-	infos, err := ioutil.ReadDir(dir)
+	infos, err := os.ReadDir(dir)
 	if err != nil {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,

@@ -26,7 +26,7 @@ type OpaquePacket struct {
 }
 
 func (op *OpaquePacket) parse(r io.Reader) (err error) {
-	op.Contents, err = ioutil.ReadAll(r)
+	op.Contents, err = io.ReadAll(r)
 	return
 }
 

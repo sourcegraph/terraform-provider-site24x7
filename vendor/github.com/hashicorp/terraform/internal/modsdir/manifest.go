@@ -59,7 +59,7 @@ type manifestSnapshotFile struct {
 }
 
 func ReadManifestSnapshot(r io.Reader) (Manifest, error) {
-	src, err := ioutil.ReadAll(r)
+	src, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}

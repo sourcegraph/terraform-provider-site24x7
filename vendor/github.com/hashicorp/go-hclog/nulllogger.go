@@ -43,5 +43,5 @@ func (l *nullLogger) ResetNamed(name string) Logger { return l }
 func (l *nullLogger) SetLevel(level Level) {}
 
 func (l *nullLogger) StandardLogger(opts *StandardLoggerOptions) *log.Logger {
-	return log.New(ioutil.Discard, "", log.LstdFlags)
+	return log.New(io.Discard, "", log.LstdFlags)
 }

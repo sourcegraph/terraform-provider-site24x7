@@ -48,7 +48,7 @@ func findPluginPaths(kind string, dirs []string) []string {
 	ret := make([]string, 0, len(dirs))
 
 	for _, dir := range dirs {
-		items, err := ioutil.ReadDir(dir)
+		items, err := os.ReadDir(dir)
 		if err != nil {
 			// Ignore missing dirs, non-dirs, etc
 			continue

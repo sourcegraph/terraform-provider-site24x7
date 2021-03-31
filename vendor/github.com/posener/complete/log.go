@@ -14,7 +14,7 @@ import (
 var Log = getLogger()
 
 func getLogger() func(format string, args ...interface{}) {
-	var logfile = ioutil.Discard
+	var logfile = io.Discard
 	if os.Getenv(envDebug) != "" {
 		logfile = os.Stderr
 	}

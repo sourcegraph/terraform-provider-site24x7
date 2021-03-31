@@ -66,7 +66,7 @@ func NewUserId(name, comment, email string) *UserId {
 
 func (uid *UserId) parse(r io.Reader) (err error) {
 	// RFC 4880, section 5.11
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return
 	}

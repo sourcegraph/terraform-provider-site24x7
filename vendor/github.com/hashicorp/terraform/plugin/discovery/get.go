@@ -642,7 +642,7 @@ func getFile(url string) ([]byte, error) {
 		return nil, fmt.Errorf("%s", resp.Status)
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return data, err
 	}

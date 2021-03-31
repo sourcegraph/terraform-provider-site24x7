@@ -55,7 +55,7 @@ func (p *Parser) ParseHCLFile(filename string) (*hcl.File, hcl.Diagnostics) {
 		return existing, nil
 	}
 
-	src, err := ioutil.ReadFile(filename)
+	src, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, hcl.Diagnostics{
 			{

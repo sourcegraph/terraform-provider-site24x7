@@ -32,7 +32,7 @@ func Creds(ctx context.Context, ds *DialSettings) (*google.DefaultCredentials, e
 		return google.CredentialsFromJSON(ctx, ds.CredentialsJSON, ds.Scopes...)
 	}
 	if ds.CredentialsFile != "" {
-		data, err := ioutil.ReadFile(ds.CredentialsFile)
+		data, err := os.ReadFile(ds.CredentialsFile)
 		if err != nil {
 			return nil, fmt.Errorf("cannot read credentials file: %v", err)
 		}

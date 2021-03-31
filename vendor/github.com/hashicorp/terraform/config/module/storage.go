@@ -88,7 +88,7 @@ func (s Storage) loadManifest() (moduleManifest, error) {
 	manifest := moduleManifest{}
 
 	manifestPath := filepath.Join(s.StorageDir, manifestName)
-	data, err := ioutil.ReadFile(manifestPath)
+	data, err := os.ReadFile(manifestPath)
 	if err != nil && !os.IsNotExist(err) {
 		return manifest, err
 	}
@@ -138,7 +138,7 @@ func (s Storage) recordModule(rec moduleRecord) error {
 	}
 
 	manifestPath := filepath.Join(s.StorageDir, manifestName)
-	return ioutil.WriteFile(manifestPath, js, 0644)
+	return os.WriteFile(manifestPath, js, 0644)
 }
 
 // load the manifest from dir, and return all module versions matching the

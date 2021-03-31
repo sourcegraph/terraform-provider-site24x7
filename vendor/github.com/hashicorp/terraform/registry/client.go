@@ -183,7 +183,7 @@ func (c *Client) ModuleLocation(module *regsrc.Module, version string) (string, 
 	defer resp.Body.Close()
 
 	// there should be no body, but save it for logging
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("error reading response body from registry: %s", err)
 	}

@@ -172,7 +172,7 @@ func (t *hclConfigurable) Config() (*Config, error) {
 // files and turn them into hclConfigurables.
 func loadFileHcl(root string) (configurable, []string, error) {
 	// Read the HCL file and prepare for parsing
-	d, err := ioutil.ReadFile(root)
+	d, err := os.ReadFile(root)
 	if err != nil {
 		return nil, nil, fmt.Errorf(
 			"Error reading %s: %s", root, err)

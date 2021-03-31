@@ -61,7 +61,7 @@ func (cs *contentSniffer) ContentType() (string, bool) {
 	}
 	cs.sniffed = true
 	// If ReadAll hits EOF, it returns err==nil.
-	cs.start, cs.err = ioutil.ReadAll(io.LimitReader(cs.r, sniffBuffSize))
+	cs.start, cs.err = io.ReadAll(io.LimitReader(cs.r, sniffBuffSize))
 
 	// Don't try to detect the content type based on possibly incomplete data.
 	if cs.err != nil {
@@ -282,8 +282,8 @@ func (mi *MediaInfo) UploadRequest(reqHeaders http.Header, body io.Reader) (newB
 		combined, ctype := CombineBodyMedia(body, "application/json", media, mi.mType)
 		if fb != nil && fm != nil {
 			getBody = func() (io.ReadCloser, error) {
-				rb := ioutil.NopCloser(fb())
-				rm := ioutil.NopCloser(fm())
+				rb := io.NopCloser(fb())
+				rm := io.NopCloser(fm())
 				r, _ := CombineBodyMedia(rb, "application/json", rm, mi.mType)
 				return r, nil
 			}

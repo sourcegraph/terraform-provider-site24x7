@@ -79,7 +79,7 @@ func ParseFile(filename string) (*hcl.File, hcl.Diagnostics) {
 	}
 	defer f.Close()
 
-	src, err := ioutil.ReadAll(f)
+	src, err := io.ReadAll(f)
 	if err != nil {
 		return nil, hcl.Diagnostics{
 			{

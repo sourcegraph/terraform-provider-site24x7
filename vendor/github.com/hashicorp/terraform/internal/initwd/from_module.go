@@ -48,7 +48,7 @@ func DirFromModule(rootDir, modulesDir, sourceAddr string, reg *registry.Client,
 
 	// The target directory must exist but be empty.
 	{
-		entries, err := ioutil.ReadDir(rootDir)
+		entries, err := os.ReadDir(rootDir)
 		if err != nil {
 			if os.IsNotExist(err) {
 				diags = diags.Append(tfdiags.Sourceless(

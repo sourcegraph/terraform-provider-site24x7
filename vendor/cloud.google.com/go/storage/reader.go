@@ -143,7 +143,7 @@ func (o *ObjectHandle) NewRangeReader(ctx context.Context, offset, length int64)
 				return ErrObjectNotExist
 			}
 			if res.StatusCode < 200 || res.StatusCode > 299 {
-				body, _ := ioutil.ReadAll(res.Body)
+				body, _ := io.ReadAll(res.Body)
 				res.Body.Close()
 				return &googleapi.Error{
 					Code:   res.StatusCode,
@@ -270,7 +270,7 @@ func parseCRC32c(res *http.Response) (uint32, bool) {
 	return 0, false
 }
 
-var emptyBody = ioutil.NopCloser(strings.NewReader(""))
+var emptyBody = io.NopCloser(strings.NewReader(""))
 
 // Reader reads a Cloud Storage object.
 // It implements io.Reader.

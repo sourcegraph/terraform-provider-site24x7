@@ -34,7 +34,7 @@ func TestDecompressor(t testing.T, d Decompressor, cases []TestDecompressCase) {
 		t.Logf("Testing: %s", tc.Input)
 
 		// Temporary dir to store stuff
-		td, err := ioutil.TempDir("", "getter")
+		td, err := os.MkdirTemp("", "getter")
 		if err != nil {
 			t.Fatalf("err: %s", err)
 		}

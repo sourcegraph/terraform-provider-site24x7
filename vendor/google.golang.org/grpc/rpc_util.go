@@ -78,7 +78,7 @@ func NewGZIPCompressorWithLevel(level int) (Compressor, error) {
 	return &gzipCompressor{
 		pool: sync.Pool{
 			New: func() interface{} {
-				w, err := gzip.NewWriterLevel(ioutil.Discard, level)
+				w, err := gzip.NewWriterLevel(io.Discard, level)
 				if err != nil {
 					panic(err)
 				}
@@ -144,7 +144,7 @@ func (d *gzipDecompressor) Do(r io.Reader) ([]byte, error) {
 		z.Close()
 		d.pool.Put(z)
 	}()
-	return ioutil.ReadAll(z)
+	return io.ReadAll(z)
 }
 
 func (d *gzipDecompressor) Type() string {
@@ -636,7 +636,7 @@ func recvAndDecompress(p *parser, s *transport.Stream, dc Decompressor, maxRecei
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "grpc: failed to decompress the received message %v", err)
 			}
-			d, err = ioutil.ReadAll(dcReader)
+			d, err = io.ReadAll(dcReader)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "grpc: failed to decompress the received message %v", err)
 			}

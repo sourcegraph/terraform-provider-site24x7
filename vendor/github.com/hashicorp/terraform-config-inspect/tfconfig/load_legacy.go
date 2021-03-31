@@ -22,7 +22,7 @@ func loadModuleLegacyHCL(dir string) (*Module, Diagnostics) {
 	}
 
 	for _, filename := range primaryPaths {
-		src, err := ioutil.ReadFile(filename)
+		src, err := os.ReadFile(filename)
 		if err != nil {
 			return mod, diagnosticsErrorf("Error reading %s: %s", filename, err)
 		}

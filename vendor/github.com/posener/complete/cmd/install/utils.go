@@ -90,7 +90,7 @@ func removeContentToTempFile(name, content string) (string, error) {
 		return "", err
 	}
 	defer rf.Close()
-	wf, err := ioutil.TempFile("/tmp", "complete-")
+	wf, err := os.CreateTemp("/tmp", "complete-")
 	if err != nil {
 		return "", err
 	}

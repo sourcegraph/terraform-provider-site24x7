@@ -466,7 +466,7 @@ func interpolationFuncFile() ast.Function {
 			if err != nil {
 				return "", err
 			}
-			data, err := ioutil.ReadFile(path)
+			data, err := os.ReadFile(path)
 			if err != nil {
 				return "", err
 			}
